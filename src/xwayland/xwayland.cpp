@@ -608,6 +608,12 @@ void Xwayland::runXWaylandStartupScripts()
             qCDebug(KWIN_XWL) << "Finished Xwayland startup script" << path;
             process->deleteLater();
         });
+        connect(process, &QProcess::errorOccurred, process, [process, path, readyGuard](QProcess::ProcessError error) {
+            if (error == QProcess::FailedToStart) {
+                qCWarning(KWIN_XWL) << "Could not start Xwayland startup script" << path << process->errorString();
+                process->deleteLater();
+            }
+        });
         process->start(path);
     }
 }
